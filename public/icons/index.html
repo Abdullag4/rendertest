@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <link rel="manifest" href="manifest.json" />
+  <title>TimeApp PWA</title>
+  <meta name="theme-color" content="#000000" />
+</head>
+<body style="margin:0; padding:0; height:100vh">
+  <!-- Embed your Streamlit app here -->
+  <iframe
+    src="https://<YOUR-RENDER-URL>.onrender.com"
+    style="border:none; width:100%; height:100%;"
+  ></iframe>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("sw.js")
+        .catch((err) => console.error("SW registration failed:", err));
+    }
+  </script>
+</body>
+</html>
