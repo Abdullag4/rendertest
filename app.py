@@ -1,15 +1,41 @@
 import streamlit as st
 from datetime import datetime, date
+from pathlib import Path
 
-# ── Inject PWA meta & service worker ─────────────────
+# ── Serve PWA Static Files via Query ─────────────────────────
+query_params = st.query_params
+
+if query_params.get("file") == "manifest":
+    st.content_type("application/json")
+    st.markdown(Path("manifest.json").read_text(), unsafe_allow_html=True)
+    st.stop()
+
+if query_params.get("file") == "sw":
+    st.content_type("application/javascript")
+    st.markdown(Path("sw.js").read_text(), unsafe_allow_html=True)
+    st.stop()
+
+if "icon" in query_params:
+    icon_path = Path("icons") / query_params["icon"]
+    if icon_path.exists():
+        ext = icon_path.suffix
+        content_type = {
+            ".png": "image/png",
+            ".svg": "image/svg+xml"
+        }.get(ext, "application/octet-stream")
+        st.content_type(content_type)
+        st.image(str(icon_path))  # Streamlit handles display
+        st.stop()
+
+# ── Inject PWA Meta + Service Worker ─────────────────────────
 st.markdown("""
-<link rel="manifest" href="/manifest.json" />
+<link rel="manifest" href="/?file=manifest" />
 <meta name="theme-color" content="#000000"/>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('/?file=sw')
       .then(function(registration) {
         console.log('ServiceWorker registered with scope:', registration.scope);
       }).catch(function(err) {
