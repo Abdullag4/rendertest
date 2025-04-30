@@ -1,6 +1,24 @@
 import streamlit as st
 from datetime import datetime, date
 
+# ── Inject PWA meta & service worker ─────────────────
+st.markdown("""
+<link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#000000"/>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(registration) {
+        console.log('ServiceWorker registered with scope:', registration.scope);
+      }).catch(function(err) {
+        console.log('ServiceWorker registration failed:', err);
+      });
+  }
+</script>
+""", unsafe_allow_html=True)
+
 # ── Initialize storage ───────────────────────────────
 if "tasks" not in st.session_state:
     st.session_state.tasks = []
@@ -50,7 +68,7 @@ if st.session_state.tasks:
             if not task["completed"]:
                 delta = task["due_datetime"] - datetime.now()
                 timer = str(delta).split('.')[0]
-                st.write(timer if delta.total_seconds()>0 else "⚠️ Overdue!")
+                st.write(timer if delta.total_seconds() > 0 else "⚠️ Overdue!")
         
         # Completed checkbox
         with col2:
